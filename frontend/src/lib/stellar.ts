@@ -86,29 +86,13 @@ export async function getUserColor(userAddress: string) {
     const contract = new Contract(CONTRACT_ID);
     const userVal = nativeToScVal(Address.fromString(userAddress));
 
-    const result = await server.getContractData(
-      contract.address(),
-      nativeToScVal("COLORS", { type: "symbol" }),
-      rpc.Durability.Persistent
-    );
-
-    if (result && result.val) {
-      const colorsMap = scValToNative(result.val as any);
-      // The contract logic stores a map of Address to String
-      // If result.val is the map, we need to find the user's color.
-      // map is: Map<Address, String>
-      const color = colorsMap.get ? colorsMap.get(userAddress) : null;
-      return color;
-    }
-
-    // Alternative: call get_color function directly via simulateTransaction
+    // Use simulateTransaction to call get_color directly.
+    // This avoids parsing the entire COLORS map and prevents toBigInt errors.
     const tx = new TransactionBuilder(
-      new Account(Keypair.random().publicKey(), "0"), // Use a dummy Account for simulation
+      new Account(Keypair.random().publicKey(), "0"), // Dummy account for simulation
       { fee: "100", networkPassphrase: NETWORK_PASSPHRASE }
     )
-      .addOperation(
-        contract.call("get_color", userVal)
-      )
+      .addOperation(contract.call("get_color", userVal))
       .setTimeout(30)
       .build();
 
