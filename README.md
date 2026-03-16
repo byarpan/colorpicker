@@ -1,5 +1,7 @@
 # 🌟 StellarColor — Define Your Digital Aura
 
+![StellarColor Dashboard](./assets/screenshot.png)
+
 StellarColor is a high-end, decentralized application built on the **Stellar Blockchain**. It allows users to select a color that represents their digital identity and store it permanently on-chain using **Soroban Smart Contracts**.
 
 ![Neo-Brutalist Interface](https://img.shields.io/badge/Design-Neo--Brutalism-EBFF00?style=for-the-badge&logoColor=black)
