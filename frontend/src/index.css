@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+@theme {
+  --color-electric: #00d4ff;
+  --color-cyber: #a855f7;
+  --color-acid: #39ff14;
+  --color-deep: #0a0a0f;
+  --color-card: #111118;
+  --color-border: #1e1e2a;
+  --color-surface: #16161f;
+
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--color-deep);
+    color: #e4e4e7;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  ::selection {
+    background: var(--color-cyber);
+    color: #fff;
+  }
+}
+
+/* Neo-Brutalist Card */
+.brutal-card {
+  background: var(--color-card);
+  border: 3px solid #2a2a3a;
+  box-shadow: 8px 8px 0px #000;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.brutal-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 10px 10px 0px #000;
+}
+
+/* Neon Glow */
+.glow-electric {
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3), 0 0 60px rgba(0, 212, 255, 0.1);
+}
+.glow-cyber {
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.3), 0 0 60px rgba(168, 85, 247, 0.1);
+}
+.glow-acid {
+  box-shadow: 0 0 20px rgba(57, 255, 20, 0.3), 0 0 60px rgba(57, 255, 20, 0.1);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-electric), var(--color-cyber), var(--color-acid));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Brutalist Button */
+.brutal-btn {
+  border: 3px solid #000;
+  box-shadow: 5px 5px 0px #000;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+.brutal-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0px #000;
+}
+.brutal-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #000;
+}
+
+/* Glass navbar */
+.glass-nav {
+  background: rgba(10, 10, 15, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 3px solid #1e1e2a;
+}
+
+/* Color picker overrides */
+.react-colorful {
+  width: 100% !important;
+  height: 200px !important;
+  border-radius: 0 !important;
+  border: 3px solid #2a2a3a !important;
+}
+.react-colorful__saturation {
+  border-radius: 0 !important;
+}
+.react-colorful__hue {
+  border-radius: 0 !important;
+  height: 20px !important;
+  margin-top: 8px;
+}
+.react-colorful__pointer {
+  width: 20px !important;
+  height: 20px !important;
+  border: 3px solid #000 !important;
+  box-shadow: 3px 3px 0px #000 !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-deep);
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a3a;
+  border: 2px solid var(--color-deep);
+}
+
+/* Loading spinner */
+@keyframes spin-brutal {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.spin-brutal {
+  animation: spin-brutal 1s steps(8) infinite;
+}
+
+/* Pulse glow */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}

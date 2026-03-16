@@ -20,16 +20,10 @@ import { CONTRACT_ID, NETWORK_PASSPHRASE, RPC_URL } from "./constants";
 
 const server = new rpc.Server(RPC_URL);
 
-/**
- * Checks if Freighter is installed and attempts to wake it up.
- */
 export async function checkWalletConnection() {
   try {
     const result = await isConnected();
     if (result.isConnected) return true;
-
-    // Fallback: Sometimes isConnected is false if just installed or locked, 
-    // but a direct getAddress might trigger it.
     const address = await getWalletAddress();
     return !!address;
   } catch (e) {
@@ -37,28 +31,19 @@ export async function checkWalletConnection() {
   }
 }
 
-/**
- * Robustly connects to Freighter by attempting multiple access patterns.
- */
 export async function connectFreighter(): Promise<{ address?: string; error?: string }> {
   try {
-    // 1. Try to get address silently first
     const silentResult = await getAddress();
     if (silentResult && silentResult.address) {
       return { address: silentResult.address };
     }
-
-    // 2. Explicit request - this triggers the "Share Address" popup
     const authorizedAddress = await requestAccess();
     if (authorizedAddress && typeof authorizedAddress === "string") {
       return { address: authorizedAddress };
     }
-
-    // Handle case where authorizedAddress might be an object in some environments
     if (authorizedAddress && (authorizedAddress as any).address) {
       return { address: (authorizedAddress as any).address };
     }
-
     return { error: "No account found or authorization declined." };
   } catch (error: any) {
     console.error("Freighter connection error:", error);
@@ -66,9 +51,6 @@ export async function connectFreighter(): Promise<{ address?: string; error?: st
   }
 }
 
-/**
- * Gets the address of the connected wallet.
- */
 export async function getWalletAddress() {
   try {
     const result = await getAddress();
@@ -78,18 +60,13 @@ export async function getWalletAddress() {
   }
 }
 
-/**
- * Retrieves the stored color for a user.
- */
 export async function getUserColor(userAddress: string) {
   try {
     const contract = new Contract(CONTRACT_ID);
     const userVal = nativeToScVal(Address.fromString(userAddress));
 
-    // Use simulateTransaction to call get_color directly.
-    // This avoids parsing the entire COLORS map and prevents toBigInt errors.
     const tx = new TransactionBuilder(
-      new Account(Keypair.random().publicKey(), "0"), // Dummy account for simulation
+      new Account(Keypair.random().publicKey(), "0"),
       { fee: "100", networkPassphrase: NETWORK_PASSPHRASE }
     )
       .addOperation(contract.call("get_color", userVal))
@@ -103,7 +80,6 @@ export async function getUserColor(userAddress: string) {
         return scValToNative(result.retval);
       }
     }
-
     return null;
   } catch (error) {
     console.error("Error fetching user color:", error);
@@ -111,16 +87,12 @@ export async function getUserColor(userAddress: string) {
   }
 }
 
-/**
- * Stores a color for the user.
- */
 export async function pickColor(userAddress: string, color: string) {
   try {
     const contract = new Contract(CONTRACT_ID);
     const userVal = nativeToScVal(Address.fromString(userAddress));
     const colorVal = nativeToScVal(color);
 
-    // Proper transaction preparation:
     let account;
     try {
       account = await server.getAccount(userAddress);
@@ -139,7 +111,6 @@ export async function pickColor(userAddress: string, color: string) {
       .setTimeout(30)
       .build();
 
-    // MANDATORY FOR SOROBAN: Prepare the transaction (Simulates and adds footprints/fees)
     let preparedTx;
     try {
       preparedTx = await server.prepareTransaction(tx);
@@ -155,14 +126,12 @@ export async function pickColor(userAddress: string, color: string) {
     const signedXdr = signedResponse.signedTxXdr;
     const finalTx = TransactionBuilder.fromXDR(signedXdr, NETWORK_PASSPHRASE);
 
-    // Submit transaction and wait for ledger inclusion
     const sendResponse = await server.sendTransaction(finalTx);
 
     if (sendResponse.status === "ERROR") {
       throw new Error(`Transaction failed: ${sendResponse.errorResult}`);
     }
 
-    // Wait for the transaction to be confirmed
     let status: any = sendResponse.status;
     let pollCount = 0;
     while (status === "PENDING" && pollCount < 10) {
@@ -175,7 +144,6 @@ export async function pickColor(userAddress: string, color: string) {
     return sendResponse;
   } catch (error: any) {
     console.error("Error picking color:", error);
-    // Preserving already prefixed errors, prefixing unknown ones
     if (error.message && (
       error.message.startsWith("SIMULATION_FAILED") || 
       error.message.startsWith("SIGNING_FAILED") || 
